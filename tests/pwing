@@ -1,0 +1,20 @@
+#!/bin/bash
+
+V=(40)
+
+opfile=pwing.dat
+
+rm -f ${opfile}
+
+for (( i=0; i < ${#V[@]} ; i++ )) do
+    v=${V[i]}
+    echo Velocity: ${v}
+    ../tools/llt-solve -w -L wing.llt -n 64 -U ${v} -H 0.0508 -O 26.247 \
+    		       -T 1 -W \
+		       -s naca4412.sec \
+		       2&> log.dat  > cl-${i}.dat
+    ##  -a 0.2353
+    T=`grep force log.dat | cut -d " " -f 4`
+    M=`grep moment log.dat | cut -d " " -f 4`
+    echo ${v} ${T} ${M} >> ${opfile}
+done

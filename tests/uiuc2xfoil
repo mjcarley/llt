@@ -1,0 +1,29 @@
+#!/bin/bash
+
+ufile=$1
+xfile=$2
+
+rm -f ${xfile}
+
+head -n1 ${ufile} >> ${xfile}
+## number of points on upper and lower surfaces, stripping decimal points
+## and DOS end-of-line
+np=(`sed -n '2p' ${ufile} | sed -e 's/\.//g' | sed -e 's/\r//'`)
+##echo ${np[0]}
+##echo ${np[1]}
+
+((sline = np[0]+3))
+## sed command to extract upper surface points
+scmd="4,${sline}p;"
+##echo $scmd
+sed -n ${scmd} ${ufile} | tac >> ${xfile}
+
+## sed command to extract lower surface
+((sline = sline+3))
+((eline = sline + np[1]))
+##echo ${sline}
+##echo ${eline}
+scmd="${sline},${eline}p;"
+##echo $scmd
+sed -n ${scmd} ${ufile} >> ${xfile}
+

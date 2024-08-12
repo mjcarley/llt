@@ -1,0 +1,16 @@
+# wake relaxation/rollup
+# update vortex lattice circulations as elements stretch during rollup
+# improved Re interpolation for c_l, etc
+# aerofoil database with look up as function of Re, M, U, etc
+# Newton's method, and other solvers
+# file format for lifting line and wake import and export
+# provision for restart
+# vortex particle data type (to model particle based wakes)
+# particle wake model with shedding from lattice wake
+# writing of complete solution at each time step (also used for restart)
+# wake truncation
+# interface to xfoil
+# input format for general geometries and motion specification
+# graphical output format for visualisation and checking
+# threading of lattice velocity evaluations
+# externally imposed velocity field

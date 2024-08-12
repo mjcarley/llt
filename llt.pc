@@ -1,0 +1,28 @@
+/* This file is part of LLT, a library for Generalized Lifting Line calculations
+ *
+ * Copyright (C) 2024 Michael Carley
+ *
+ * LLT is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version. LLT is distributed in the
+ * hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LLT.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+prefix=/home/michael/Codes
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: llt
+Description: Library and tools for Lifting Line Theory in aerodynamics
+Version: 1.0.0
+Requires: glib-2.0
+##gthread-2.0
+Libs: -L${libdir} -lllt
+Cflags: -I${includedir}

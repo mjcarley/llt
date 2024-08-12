@@ -1,0 +1,7 @@
+/**
+  @mainpage Lifting Line Theory for aerodynamics
+
+  @defgroup lattice Vortex lattices
+  	    
+  @defgroup vorticity Vortex particles
+*/

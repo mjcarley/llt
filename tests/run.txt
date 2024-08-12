@@ -1,0 +1,18 @@
+    PLOP
+    G
+    
+    LOAD /home/michael/Scratch/e387.dat
+    PANE
+    OPER
+    VISC 1e6
+    ALFA 2
+    !
+    PACC
+    polar_tmp.dat
+
+    ASEQ 2 15 0.1
+    INIT
+    ASEQ 2 -10 0.1
+    PACC
+
+    QUIT

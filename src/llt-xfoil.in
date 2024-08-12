@@ -1,0 +1,144 @@
+#!/bin/sh
+# @configure_input@
+
+## path to executable
+XFOIL="@XFOIL@"
+
+usage()
+{
+    cat <<EOF
+Generation of aerofoil polar plots using Xfoil
+
+Usage: llt-xfoil [OPTIONS]
+
+Options:
+	--aerofoil=(filename)   [aerofoil geometry file (required)]
+	--alpha-min=#           [minimum incidence]
+	--alpha-max=#           [maximum incidence]
+	--delta-alpha=#         [angular step in incidence]
+	--directory=(directory) [working directory (required)]
+	--Reynolds=#            [Reynolds number (required)]
+	--clean-up              [remove working files on completion]
+	--clean-up-directory    [remove working directory on completion]
+EOF
+exit 1
+    }
+
+cleanup=no
+cleanup_directory=no
+alpha_min=-10
+alpha_max=10
+alpha_start=2
+delta_alpha=0.125
+polar_file=polar.dat
+
+while test $# -gt 0; do
+  case "$1" in
+  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+  *) optarg= ;;
+  esac
+
+  case $1 in
+    --help)
+	usage $1
+	exit $1
+	;;
+    --aerofoil=*)
+	aerofoil=$optarg
+	;;
+    --alpha-max=*)
+	alpha_max=$optarg;
+	;;
+    --alpha-min=*)
+	alpha_min=$optarg;
+	;;
+    --delta-alpha=*)
+	delta_alpha=$optarg;
+	;;    
+    --directory=*)
+	dcty=$optarg
+	;;
+    --polar-file=*)
+	polar_file=$optarg
+	;;
+    --Reynolds=*)
+	Reynolds=$optarg
+	;;
+    --clean-up)
+	cleanup=yes
+	;;
+    --clean-up-directory)
+	cleanup_directory=yes
+	;;    
+  esac
+  shift
+done
+
+## check required variables are set
+if [ -z ${dcty+x} ]; then
+    echo "$0: error, working directory must be set (--directory)"
+    exit 1
+fi
+
+if [ -z ${aerofoil+x} ]; then
+    echo "$0: error, aerofoil filename must be set (--aerofoil)"
+    exit 1
+fi
+
+if [ -z ${Reynolds+x} ]; then
+    echo "$0: error, Reynolds number must be set (--Reynolds)"
+    exit 1
+fi
+
+echo "executable:      ${XFOIL}"
+echo "directory:       ${dcty}"
+echo "aerofoil:        ${aerofoil}"
+echo "Reynolds number: ${Reynolds}"
+echo "minimum alpha:   ${alpha_min}"
+echo "maximum alpha:   ${alpha_max}"
+echo "delta alpha:     ${delta_alpha}"
+
+mkdir -p ${dcty}
+cd ${dcty}
+rm -f polar_tmp.dat
+## generate input for xfoil
+cat <<EOF > run.txt
+    PLOP
+    G
+    
+    LOAD ${aerofoil}
+    PANE
+    OPER
+    ITER 40
+    VISC ${Reynolds}
+    ALFA ${alpha_start}
+    !
+    PACC
+    polar_tmp.dat
+
+    ALFA ${alpha_start}
+    !
+    ASEQ ${alpha_start} ${alpha_max} ${delta_alpha}
+    INIT
+    ASEQ ${alpha_start} ${alpha_min} ${delta_alpha}
+    PACC
+
+    QUIT
+EOF
+
+## run xfoil and generate outputs
+${XFOIL} < run.txt &> log.txt
+
+tail -n +13 polar_tmp.dat | sort -n | uniq > llt-scratch.dat
+nlines=`wc -l llt-scratch.dat | cut -d " " -f 1`
+echo ${nlines} > ${polar_file}
+cat llt-scratch.dat >> ${polar_file}
+
+if test "$cleanup" = "yes"; then
+    rm -f llt-scratch.dat polar_tmp.dat run.txt log.txt
+fi
+
+if test "$cleanup_directory" = "yes"; then
+    cd ..
+    rm -rf ${dcty}
+fi
